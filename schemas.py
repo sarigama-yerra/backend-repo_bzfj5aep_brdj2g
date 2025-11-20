@@ -12,37 +12,28 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
-# Example schemas (replace with your own):
+# Replace example schemas with app-specific schemas
 
-class User(BaseModel):
+class Dataset(BaseModel):
+    """Dataset metadata
+    Collection name: "dataset"
     """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+    title: str = Field(..., description="Dataset title")
+    description: Optional[str] = Field(None, description="Short description of the dataset")
+    color: Optional[str] = Field("#60a5fa", description="Hex color used when charting")
 
-class Product(BaseModel):
+class Datapoint(BaseModel):
+    """Datapoints belonging to a dataset
+    Collection name: "datapoint"
     """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+    dataset_id: str = Field(..., description="ID of the related dataset (stringified ObjectId)")
+    label: str = Field(..., description="X-axis label")
+    value: float = Field(..., description="Numeric value for Y-axis")
 
-# Add your own schemas here:
-# --------------------------------------------------
-
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class DatasetWithPoints(BaseModel):
+    title: str
+    description: Optional[str]
+    color: Optional[str]
+    points: List[Datapoint] = []
